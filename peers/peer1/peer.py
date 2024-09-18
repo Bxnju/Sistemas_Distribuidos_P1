@@ -46,7 +46,7 @@ def logout(config):
     url = f"http://{config['server_ip']}:{config['server_port']}/logout"
     data = {"peer_id": config["peer_id"]}
     try:
-        response = requests.post(url, json=data)
+        response = requests.put(url, json=data)
         response.raise_for_status()
         print(response.json())
     except requests.RequestException as e:
@@ -80,7 +80,7 @@ def find_file(config, filename):
     url = f"http://{config['server_ip']}:{config['server_port']}/find"
     data = {"file_name": filename}
     try:
-        response = requests.post(url, json=data)
+        response = requests.get(url, json=data)
         response.raise_for_status()
         print(response.json())
         return response.json().get("peers", [])
