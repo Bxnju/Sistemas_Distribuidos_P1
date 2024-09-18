@@ -51,7 +51,7 @@ def login(request: LoginRequest):
     return {"message": f"Peer {request.peer_id} está activo"}
 
 # Ruta para logout de peers
-@app.post("/logout")
+@app.put("/logout")
 def logout(request: LogoutRequest):
     peers = load_peers()
     if request.peer_id in peers:
@@ -81,7 +81,7 @@ def load_files(request: LoadFilesRequest):
     raise HTTPException(status_code=404, detail="Peer no encontrado")
 
 # Ruta para encontrar el archivo en los peers
-@app.post("/find")
+@app.get("/find")
 def find_file(request: FindFileRequest):
     peers = load_peers()
     result = []
