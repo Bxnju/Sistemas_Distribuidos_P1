@@ -1,0 +1,41 @@
+{
+    "peer1": {
+        "ip": "localhost",
+        "port": 8000,
+        "files": [
+            "file1.png",
+            "file1.txt",
+            "file2.php",
+            "image.jpg",
+            "tarea2.rbx"
+        ],
+        "active": true
+    },
+    "peer2": {
+        "ip": "localhost",
+        "port": 8001,
+        "files": [
+            "file2.php",
+            "file3.png"
+        ],
+        "active": true
+    },
+    "peer3": {
+        "ip": "localhost",
+        "port": 8002,
+        "files": [
+            "404_error_checking_FI.webp",
+            "file1.png"
+        ],
+        "active": true
+    },
+    "peer4": {
+        "ip": "localhost",
+        "port": 8003,
+        "files": [
+            "1920x1080 android-iphone-desktop-hd-backgrounds-wallpapers-1080p-4k-brnbi-1920x1080.jpg",
+            "404_error_checking_FI.webp"
+        ],
+        "active": false
+    }
+}

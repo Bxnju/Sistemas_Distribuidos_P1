@@ -1,0 +1,8 @@
+{
+    "peer_id": "peer2",
+    "ip": "localhost",
+    "port": 8001,
+    "directory": "C:\\Users\\juana\\OneDrive - UPB\\Arquitectura de Nube y Sistemas Distribuidos\\Proyecto #1\\files\\peer2_files",
+    "server_ip": "localhost",
+    "server_port": 5050
+}
