@@ -1,5 +1,8 @@
 import sys
 import os
+import shutil
+import tkinter as tk
+from tkinter import filedialog
 
 # Agregar el directorio gRPC al PYTHONPATH
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'gRPC'))
@@ -106,7 +109,7 @@ def download_file(peer_ip, peer_port, file_name, save_path):
             stub = file_service_pb2_grpc.FileServiceStub(channel)
             request = file_service_pb2.FileRequest(file_name=file_name)
             response_iterator = stub.DownloadFile(request)
-            
+
             # Verificar si se recibe algún dato antes de crear el archivo
             first_chunk = next(response_iterator)
             if first_chunk:
@@ -123,11 +126,69 @@ def download_file(peer_ip, peer_port, file_name, save_path):
     except StopIteration:
         print(f"File {file_name} not found on peer {peer_ip}:{peer_port}")
 
+# Función para cargar un archivo desde el explorador de archivos
+def upload(config):
+    root = tk.Tk()
+    root.withdraw()  # Ocultar la ventana principal de Tkinter
+    file_path = filedialog.askopenfilename()  # Abrir el explorador de archivos
+    if file_path:
+        try:
+            shutil.copy(file_path, config["directory"])
+            print(f"File {os.path.basename(file_path)} uploaded to {config['directory']}")
+            load_files(config)  # Actualizar la lista de archivos en el servidor
+        except Exception as e:
+            print(f"Error uploading file: {e}")
+
+# Función para eliminar un archivo del directorio compartido
+def delete_file(config, filename):
+    file_path = os.path.join(config["directory"], filename)
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+            print(f"File {filename} deleted from {config['directory']}")
+            load_files(config)  # Actualizar la lista de archivos en el servidor
+        except Exception as e:
+            print(f"Error deleting file: {e}")
+    else:
+        print(f"File {filename} does not exist in {config['directory']}")
+
+# Función para listar todos los archivos compartidos por el peer
+def list_files(config):
+    files = get_files(config["directory"])
+    print("Shared files:")
+    for file in files:
+        print(file)
+
+# Función para listar todos los peers activos en el servidor
+def list_active_peers(config):
+    url = f"http://{config['server_ip']}:{config['server_port']}/active_peers"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        peers = response.json().get("peers", [])
+        print("Active peers:")
+        for peer in peers:
+            print(peer)
+    except requests.RequestException as e:
+        print(f"Error listing active peers: {e}")
+
+# Función para obtener una lista de todos los archivos disponibles en el servidor
+def list_all_files(config):
+    url = f"http://{config['server_ip']}:{config['server_port']}/all_files"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        files = response.json().get("files", [])
+        print("All available files on the server:")
+        for file in files:
+            print(file)
+    except requests.RequestException as e:
+        print(f"Error listing all files: {e}")
 
 def main():
     parser = argparse.ArgumentParser(description="Peer Service")
-    parser.add_argument("action", choices=["login", "logout", "delete", "load_files", "find", "download"], help="Action to perform")
-    parser.add_argument("--filename", help="File name to find or download")
+    parser.add_argument("action", choices=["login", "logout", "delete", "load_files", "find", "download", "upload", "delete_file", "list_files", "list_active_peers", "list_all_files"], help="Action to perform")
+    parser.add_argument("--filename", help="File name to find, download, or delete")
     args = parser.parse_args()
 
     config = load_config()
@@ -150,6 +211,19 @@ def main():
             download(config, args.filename)
         else:
             print("Filename required for download action")
+    elif args.action == "upload":
+        upload(config)
+    elif args.action == "delete_file":
+        if args.filename:
+            delete_file(config, args.filename)
+        else:
+            print("Filename required for delete_file action")
+    elif args.action == "list_files":
+        list_files(config)
+    elif args.action == "list_active_peers":
+        list_active_peers(config)
+    elif args.action == "list_all_files":
+        list_all_files(config)
 
 if __name__ == "__main__":
     main()
